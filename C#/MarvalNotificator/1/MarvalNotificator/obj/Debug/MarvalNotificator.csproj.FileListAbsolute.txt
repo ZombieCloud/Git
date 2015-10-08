@@ -1,0 +1,9 @@
+E:\documents\C#Programms\Programm\MarvalNotificator\1\MarvalNotificator\bin\Debug\MarvalNotificator.exe.config
+E:\documents\C#Programms\Programm\MarvalNotificator\1\MarvalNotificator\bin\Debug\MarvalNotificator.exe
+E:\documents\C#Programms\Programm\MarvalNotificator\1\MarvalNotificator\bin\Debug\MarvalNotificator.pdb
+E:\documents\C#Programms\Programm\MarvalNotificator\1\MarvalNotificator\obj\Debug\MarvalNotificator.csprojResolveAssemblyReference.cache
+E:\documents\C#Programms\Programm\MarvalNotificator\1\MarvalNotificator\obj\Debug\MarvalNotificator.Form1.resources
+E:\documents\C#Programms\Programm\MarvalNotificator\1\MarvalNotificator\obj\Debug\MarvalNotificator.Properties.Resources.resources
+E:\documents\C#Programms\Programm\MarvalNotificator\1\MarvalNotificator\obj\Debug\MarvalNotificator.csproj.GenerateResource.Cache
+E:\documents\C#Programms\Programm\MarvalNotificator\1\MarvalNotificator\obj\Debug\MarvalNotificator.exe
+E:\documents\C#Programms\Programm\MarvalNotificator\1\MarvalNotificator\obj\Debug\MarvalNotificator.pdb
