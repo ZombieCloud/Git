@@ -23,7 +23,8 @@
             android:text="New Text"
             android:id="@+id/textView"
             android:layout_gravity="center_horizontal"
-            android:layout_weight="0.94" />
+            android:layout_weight="0.94"
+            android:minHeight="350dp" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -35,24 +36,30 @@
                 android:layout_height="wrap_content"
                 android:inputType="number"
                 android:ems="10"
-                android:id="@+id/editText"
-                android:layout_weight="1" />
+                android:id="@+id/firstWord"
+                android:layout_weight="1"
+                android:numeric="integer"
+                android:singleLine="true" />
 
             <EditText
                 android:layout_width="98dp"
                 android:layout_height="wrap_content"
                 android:inputType="number"
                 android:ems="10"
-                android:id="@+id/editText2"
-                android:layout_weight="1" />
+                android:id="@+id/lastWord"
+                android:layout_weight="1"
+                android:numeric="integer"
+                android:singleLine="true" />
 
             <EditText
                 android:layout_width="96dp"
                 android:layout_height="wrap_content"
                 android:inputType="number"
                 android:ems="10"
-                android:id="@+id/editText3"
-                android:layout_weight="1" />
+                android:id="@+id/timeInterval"
+                android:layout_weight="1"
+                android:numeric="integer"
+                android:singleLine="true" />
 
         </LinearLayout>
 
@@ -61,8 +68,8 @@
             android:layout_height="wrap_content"
             android:text="Go !!!"
             android:id="@+id/button"
-            android:layout_weight="0.04"
-            android:onClick="buttonOnClick" />
+            android:onClick="buttonOnClick"
+            android:layout_weight="0.19" />
 
     </LinearLayout>
 </RelativeLayout>

@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.io.InputStream;
@@ -23,19 +24,11 @@ public class WordsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_words);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
     }
 
+    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -57,21 +50,22 @@ public class WordsActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
+*/
 
     public void buttonOnClick(View v) {
         Button button = (Button) v;
         button.setText("Privet !!!");
 
         TextView _textView = (TextView) findViewById(R.id.textView);
-//        _textView.setText("Go to hell");
+        EditText _firstWord = (EditText) findViewById(R.id.firstWord);
 
         URL url;
         String str = "";
 
         HttpURLConnection urlConnection = null;
         try {
-            url = new URL("http://tests.progmans.net/index.php?WORD_NUM=7");
+//            url = new URL("http://tests.progmans.net/index.php?WORD_NUM=7");
+            url = new URL("http://tests.progmans.net/index.php?WORD_NUM=" + _firstWord.getText());
 
             urlConnection = (HttpURLConnection) url.openConnection();
 
