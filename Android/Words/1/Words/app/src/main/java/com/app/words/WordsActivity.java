@@ -95,10 +95,16 @@ public class WordsActivity extends AppCompatActivity {
     EditText _firstWord;
     EditText _lastWord;
     EditText _timeInterval;
+    Button button;
 
+    boolean weHaveWord;
     Word newWord;
 
-    Timer timer=new Timer();//Used for a delay to provide user feedback
+    int startNum;
+    int finNum;
+    int currentNum;
+
+    Timer timer;
     Handler handler;
 
 
@@ -112,6 +118,8 @@ public class WordsActivity extends AppCompatActivity {
         _firstWord = (EditText) findViewById(R.id.firstWord);
         _lastWord = (EditText) findViewById(R.id.lastWord);
         _timeInterval = (EditText) findViewById(R.id.timeInterval);
+
+        weHaveWord = false;
 
         handler = new Handler(callback);
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -144,33 +152,35 @@ public class WordsActivity extends AppCompatActivity {
 
     public void buttonOnClick(View v) throws InterruptedException {
 
-        Button button = (Button) v;
+        button = (Button) v;
         button.setText("Stop");
 
+        startNum = Integer.valueOf(_firstWord.getText().toString());
+        finNum = Integer.valueOf(_lastWord.getText().toString());
 
+        currentNum = startNum;
 
-        int startNum = Integer.valueOf(_firstWord.getText().toString());
-        int finNum = Integer.valueOf(_lastWord.getText().toString());
-
-        for (int currentNum = startNum; currentNum <= finNum; currentNum++) {
-            newWord = new Word(String.valueOf(currentNum));
-
-//            _textView.setText(newWord._en);
-//            TimeUnit.SECONDS.sleep(Integer.valueOf(_timeInterval.getText().toString()));
-            timer.schedule(new SmallDelay(), 2000);
-
-
-            _textView.setText(newWord._ru);
-//            TimeUnit.SECONDS.sleep(Integer.valueOf(_timeInterval.getText().toString()));
-            timer.schedule(new SmallDelay(), 2000);
-        }
-
+        timer = new Timer();
+        timer.schedule(new SmallDelay(), 2000);
     }
 
 
     Handler.Callback callback = new Handler.Callback() {
         public boolean handleMessage(Message msg) {
-            _textView.setText(newWord._en);
+            if (weHaveWord) {
+                _textView.setText(newWord._ru);
+                weHaveWord = false;
+            } else {
+                newWord = new Word(String.valueOf(currentNum));
+                _textView.setText(newWord._en);
+                weHaveWord = true;
+            }
+
+            if (currentNum == finNum) timer.cancel();
+
+            currentNum = currentNum + 1;
+            button.setText(String.valueOf(currentNum));
+
             return true;
         }
     };
