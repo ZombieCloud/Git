@@ -89,8 +89,6 @@ class Word {
 
 public class WordsActivity extends AppCompatActivity {
 
-//    public URL url;
-//    public HttpURLConnection urlConnection;
     TextView _textView;
     EditText _firstWord;
     EditText _lastWord;
@@ -105,7 +103,8 @@ public class WordsActivity extends AppCompatActivity {
     int currentNum;
 
     Timer timer;
-    Handler handler;
+    TimerTask timerTask;
+    final Handler handler = new Handler();
 
 
 
@@ -121,7 +120,7 @@ public class WordsActivity extends AppCompatActivity {
 
         weHaveWord = false;
 
-        handler = new Handler(callback);
+
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
     }
@@ -150,6 +149,55 @@ public class WordsActivity extends AppCompatActivity {
     }
 */
 
+
+
+    public void startTimer() {
+        //set a new Timer
+        timer = new Timer();
+        //initialize the TimerTask's job
+        initializeTimerTask();
+        //schedule the timer, after the first 10000ms the TimerTask will run every 20000ms
+        timer.schedule(timerTask, 1000, 2000);
+    }
+
+
+    public void stoptimertask(View v) {
+        //stop the timer, if it's not already null
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+    }
+
+
+
+    public void initializeTimerTask() {
+        timerTask = new TimerTask() {
+            public void run() {
+                //use a handler to run
+                handler.post(new Runnable() {
+                    public void run() {
+                        if (weHaveWord) {
+                            _textView.setText(newWord._ru);
+                            weHaveWord = false;
+                        } else {
+                            newWord = new Word(String.valueOf(currentNum));
+                            _textView.setText(newWord._en);
+                            weHaveWord = true;
+                        }
+
+                        if (currentNum == finNum) timer.cancel();
+
+                        currentNum = currentNum + 1;
+                        button.setText(String.valueOf(currentNum));
+                    }
+                });
+            }
+        };
+    }
+
+
+
     public void buttonOnClick(View v) throws InterruptedException {
 
         button = (Button) v;
@@ -160,35 +208,7 @@ public class WordsActivity extends AppCompatActivity {
 
         currentNum = startNum;
 
-        timer = new Timer();
-        timer.schedule(new SmallDelay(), 2000);
+        startTimer();
     }
 
-
-    Handler.Callback callback = new Handler.Callback() {
-        public boolean handleMessage(Message msg) {
-            if (weHaveWord) {
-                _textView.setText(newWord._ru);
-                weHaveWord = false;
-            } else {
-                newWord = new Word(String.valueOf(currentNum));
-                _textView.setText(newWord._en);
-                weHaveWord = true;
-            }
-
-            if (currentNum == finNum) timer.cancel();
-
-            currentNum = currentNum + 1;
-            button.setText(String.valueOf(currentNum));
-
-            return true;
-        }
-    };
-
-
-    class SmallDelay extends TimerTask {
-        public void run() {
-            handler.sendEmptyMessage(0);
-        }
-    }
 }
