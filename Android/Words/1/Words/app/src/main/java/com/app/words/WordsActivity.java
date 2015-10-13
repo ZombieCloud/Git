@@ -1,10 +1,9 @@
 package com.app.words;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,10 +14,83 @@ import android.widget.TextView;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.io.IOException;
 import java.net.HttpURLConnection;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+
+
+
+
+class Word {
+    public String _en = "";
+    public String _ru = "";
+    private String _num = "";
+
+
+    //Конструктор
+    public Word(String num) {
+        _num = num;
+
+        URL url;
+        HttpURLConnection urlConnection = null;
+        InputStream in;
+        int data;
+        InputStreamReader isw;
+
+        try {
+            //Слово EN (_en)
+            url = new URL("http://tests.progmans.net/index.php?NUM_EN=" + _num);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            in = urlConnection.getInputStream();
+            isw = new InputStreamReader(in);
+            data = isw.read();
+            while (data != -1) {
+                char currentSymbol = (char) data;
+                data = isw.read();
+                _en = _en + currentSymbol;
+            }
+
+            //Слово RU (_ru)
+            url = new URL("http://tests.progmans.net/index.php?NUM_RU=" + _num);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            in = urlConnection.getInputStream();
+            isw = new InputStreamReader(in);
+            data = isw.read();
+            while (data != -1) {
+                char currentSymbol = (char) data;
+                data = isw.read();
+                _ru = _ru + currentSymbol;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                urlConnection.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
+
+    }
+};
+
+
+
+
+
+
+
 public class WordsActivity extends AppCompatActivity {
+
+//    public URL url;
+//    public HttpURLConnection urlConnection;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,45 +124,26 @@ public class WordsActivity extends AppCompatActivity {
     }
 */
 
-    public void buttonOnClick(View v) {
+    public void buttonOnClick(View v) throws InterruptedException {
         Button button = (Button) v;
-        button.setText("Privet !!!");
+        button.setText("Stop");
 
         TextView _textView = (TextView) findViewById(R.id.textView);
         EditText _firstWord = (EditText) findViewById(R.id.firstWord);
+        EditText _lastWord = (EditText) findViewById(R.id.lastWord);
+        EditText _timeInterval = (EditText) findViewById(R.id.timeInterval);
 
-        URL url;
-        String str = "";
+        int startNum = Integer.valueOf(_firstWord.getText().toString());
+        int finNum = Integer.valueOf(_lastWord.getText().toString());
 
-        HttpURLConnection urlConnection = null;
-        try {
-//            url = new URL("http://tests.progmans.net/index.php?WORD_NUM=7");
-            url = new URL("http://tests.progmans.net/index.php?WORD_NUM=" + _firstWord.getText());
-
-            urlConnection = (HttpURLConnection) url.openConnection();
-
-            InputStream in = urlConnection.getInputStream();
-
-            InputStreamReader isw = new InputStreamReader(in);
-
-            int data = isw.read();
-            while (data != -1) {
-                char current = (char) data;
-                data = isw.read();
-//                System.out.print(current);
-//                _textView.setText(current);
-                str = str + current;
-            }
-            _textView.setText(str);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                urlConnection.disconnect();
-            } catch (Exception e) {
-                e.printStackTrace(); //If you want further info on failure...
-            }
+        for (int currentNum = startNum; currentNum <= finNum; currentNum++) {
+            Word newWord = new Word(String.valueOf(currentNum));
+            _textView.setText(newWord._en);
+            _textView.refreshDrawableState();
+            TimeUnit.SECONDS.sleep(Integer.valueOf(_timeInterval.getText().toString()));
+            _textView.setText(newWord._ru);
+            _textView.refreshDrawableState();
+            TimeUnit.SECONDS.sleep(Integer.valueOf(_timeInterval.getText().toString()));
         }
 
     }

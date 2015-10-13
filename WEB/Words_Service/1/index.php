@@ -8,12 +8,9 @@ if ($connection->connect_error) die($connection->connect_error);
 
 
 
-
-
-
-if (isset($_GET['WORD_NUM']))
+if (isset($_GET['NUM_EN']))
 {    
-    $num = get_post($connection, 'WORD_NUM');
+    $num = get_post($connection, 'NUM_EN');
     $query = "SELECT en FROM tab_words1 WHERE num='$num'";
     $result = $connection->query($query);
     if (!$result) die ($connection->error);
@@ -23,7 +20,16 @@ if (isset($_GET['WORD_NUM']))
 }
 
 
-
+if (isset($_GET['NUM_RU']))
+{    
+    $num = get_post($connection, 'NUM_RU');
+    $query = "SELECT ru FROM tab_words1 WHERE num='$num'";
+    $result = $connection->query($query);
+    if (!$result) die ($connection->error);
+    $result->data_seek(0);
+    $row = $result->fetch_array(MYSQLI_ASSOC);    
+    echo $row['ru'];
+}
 
 
 
