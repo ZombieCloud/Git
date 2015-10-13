@@ -1,6 +1,8 @@
 package com.app.words;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -89,6 +91,15 @@ public class WordsActivity extends AppCompatActivity {
 
 //    public URL url;
 //    public HttpURLConnection urlConnection;
+    TextView _textView;
+    EditText _firstWord;
+    EditText _lastWord;
+    EditText _timeInterval;
+
+    Word newWord;
+
+    Timer timer=new Timer();//Used for a delay to provide user feedback
+    Handler handler;
 
 
 
@@ -96,6 +107,13 @@ public class WordsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_words);
+
+        _textView = (TextView) findViewById(R.id.textView);
+        _firstWord = (EditText) findViewById(R.id.firstWord);
+        _lastWord = (EditText) findViewById(R.id.lastWord);
+        _timeInterval = (EditText) findViewById(R.id.timeInterval);
+
+        handler = new Handler(callback);
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
     }
@@ -125,26 +143,42 @@ public class WordsActivity extends AppCompatActivity {
 */
 
     public void buttonOnClick(View v) throws InterruptedException {
+
         Button button = (Button) v;
         button.setText("Stop");
 
-        TextView _textView = (TextView) findViewById(R.id.textView);
-        EditText _firstWord = (EditText) findViewById(R.id.firstWord);
-        EditText _lastWord = (EditText) findViewById(R.id.lastWord);
-        EditText _timeInterval = (EditText) findViewById(R.id.timeInterval);
+
 
         int startNum = Integer.valueOf(_firstWord.getText().toString());
         int finNum = Integer.valueOf(_lastWord.getText().toString());
 
         for (int currentNum = startNum; currentNum <= finNum; currentNum++) {
-            Word newWord = new Word(String.valueOf(currentNum));
-            _textView.setText(newWord._en);
-            _textView.refreshDrawableState();
-            TimeUnit.SECONDS.sleep(Integer.valueOf(_timeInterval.getText().toString()));
+            newWord = new Word(String.valueOf(currentNum));
+
+//            _textView.setText(newWord._en);
+//            TimeUnit.SECONDS.sleep(Integer.valueOf(_timeInterval.getText().toString()));
+            timer.schedule(new SmallDelay(), 2000);
+
+
             _textView.setText(newWord._ru);
-            _textView.refreshDrawableState();
-            TimeUnit.SECONDS.sleep(Integer.valueOf(_timeInterval.getText().toString()));
+//            TimeUnit.SECONDS.sleep(Integer.valueOf(_timeInterval.getText().toString()));
+            timer.schedule(new SmallDelay(), 2000);
         }
 
+    }
+
+
+    Handler.Callback callback = new Handler.Callback() {
+        public boolean handleMessage(Message msg) {
+            _textView.setText(newWord._en);
+            return true;
+        }
+    };
+
+
+    class SmallDelay extends TimerTask {
+        public void run() {
+            handler.sendEmptyMessage(0);
+        }
     }
 }
