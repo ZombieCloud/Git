@@ -80,6 +80,8 @@ public class WordsActivity extends AppCompatActivity {
     EditText _timeInterval;
 
     boolean weHaveWord;
+    boolean ProgramAlredyStarted;
+
     Word newWord;
 
     int startNum;
@@ -89,7 +91,6 @@ public class WordsActivity extends AppCompatActivity {
     Timer timer;
     TimerTask timerTask;
     final Handler handler = new Handler();
-//    View v;
     Button button;
 
 
@@ -103,7 +104,8 @@ public class WordsActivity extends AppCompatActivity {
         _lastWord = (EditText) findViewById(R.id.lastWord);
         _timeInterval = (EditText) findViewById(R.id.timeInterval);
 
-        weHaveWord = false;
+        weHaveWord = false;              //Эта переменная для того, чтоб англ. и рус. чередовались
+        ProgramAlredyStarted = false;      //Чтобы после паузы счетчик слов не начинался с самого начала интервала
     }
 
 
@@ -113,6 +115,9 @@ public class WordsActivity extends AppCompatActivity {
         timer = new Timer();
         //initialize the TimerTask's job
         initializeTimerTask();
+
+        button.setText("Stop");
+
         //starts the timer
         timer.schedule(timerTask, 4000, Integer.valueOf(_timeInterval.getText().toString()) * 1000);
     }
@@ -146,7 +151,12 @@ public class WordsActivity extends AppCompatActivity {
                             weHaveWord = true;
                         }
 
-                        if (currentNum > lastNum) stopTimerTask();
+                        //Закончились слова. Заново
+                        if (currentNum > lastNum){
+                            stopTimerTask();
+                            currentNum = startNum;
+                            startTimer();
+                        }
                     }
                 });
             }
@@ -160,13 +170,15 @@ public class WordsActivity extends AppCompatActivity {
 
         if (button.getText() == "Stop") {
             stopTimerTask();
-            button.setText("Go !!!");
-        } else {
-            button.setText("Stop");
 
-            startNum = Integer.valueOf(_firstWord.getText().toString());
-            lastNum = Integer.valueOf(_lastWord.getText().toString());
-            currentNum = startNum;
+        } else {
+            if (ProgramAlredyStarted == false) {
+                startNum = Integer.valueOf(_firstWord.getText().toString());
+                lastNum = Integer.valueOf(_lastWord.getText().toString());
+                currentNum = startNum;
+
+                ProgramAlredyStarted = true;
+            }
 
             startTimer();
         }
