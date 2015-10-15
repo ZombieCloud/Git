@@ -2,26 +2,17 @@ package com.app.words;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.HttpURLConnection;
-
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-
 
 
 
@@ -75,14 +66,8 @@ class Word {
                 e.printStackTrace();
             }
         }
-
-
-
     }
 };
-
-
-
 
 
 
@@ -93,19 +78,19 @@ public class WordsActivity extends AppCompatActivity {
     EditText _firstWord;
     EditText _lastWord;
     EditText _timeInterval;
-    Button button;
 
     boolean weHaveWord;
     Word newWord;
 
     int startNum;
-    int finNum;
+    int lastNum;
     int currentNum;
 
     Timer timer;
     TimerTask timerTask;
     final Handler handler = new Handler();
-
+//    View v;
+    Button button;
 
 
     @Override
@@ -119,35 +104,7 @@ public class WordsActivity extends AppCompatActivity {
         _timeInterval = (EditText) findViewById(R.id.timeInterval);
 
         weHaveWord = false;
-
-
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
     }
-
-    /*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_words, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-*/
 
 
 
@@ -156,16 +113,17 @@ public class WordsActivity extends AppCompatActivity {
         timer = new Timer();
         //initialize the TimerTask's job
         initializeTimerTask();
-        //schedule the timer, after the first 10000ms the TimerTask will run every 20000ms
-        timer.schedule(timerTask, 1000, 2000);
+        //starts the timer
+        timer.schedule(timerTask, 4000, Integer.valueOf(_timeInterval.getText().toString()) * 1000);
     }
 
 
-    public void stoptimertask(View v) {
-        //stop the timer, if it's not already null
+    public void stopTimerTask() {
+        //stop the timer
         if (timer != null) {
             timer.cancel();
             timer = null;
+            button.setText("Go !!!");
         }
     }
 
@@ -174,22 +132,21 @@ public class WordsActivity extends AppCompatActivity {
     public void initializeTimerTask() {
         timerTask = new TimerTask() {
             public void run() {
+
                 //use a handler to run
                 handler.post(new Runnable() {
                     public void run() {
                         if (weHaveWord) {
                             _textView.setText(newWord._ru);
                             weHaveWord = false;
+                            currentNum = currentNum + 1;
                         } else {
                             newWord = new Word(String.valueOf(currentNum));
                             _textView.setText(newWord._en);
                             weHaveWord = true;
                         }
 
-                        if (currentNum == finNum) timer.cancel();
-
-                        currentNum = currentNum + 1;
-                        button.setText(String.valueOf(currentNum));
+                        if (currentNum > lastNum) stopTimerTask();
                     }
                 });
             }
@@ -199,16 +156,20 @@ public class WordsActivity extends AppCompatActivity {
 
 
     public void buttonOnClick(View v) throws InterruptedException {
-
         button = (Button) v;
-        button.setText("Stop");
 
-        startNum = Integer.valueOf(_firstWord.getText().toString());
-        finNum = Integer.valueOf(_lastWord.getText().toString());
+        if (button.getText() == "Stop") {
+            stopTimerTask();
+            button.setText("Go !!!");
+        } else {
+            button.setText("Stop");
 
-        currentNum = startNum;
+            startNum = Integer.valueOf(_firstWord.getText().toString());
+            lastNum = Integer.valueOf(_lastWord.getText().toString());
+            currentNum = startNum;
 
-        startTimer();
+            startTimer();
+        }
     }
 
 }
