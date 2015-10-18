@@ -87,6 +87,7 @@ public class WordsActivity extends AppCompatActivity {
     int startNum;
     int lastNum;
     int currentNum;
+    int Interval;
 
     Timer timer;
     TimerTask timerTask;
@@ -119,7 +120,7 @@ public class WordsActivity extends AppCompatActivity {
         button.setText("Stop");
 
         //starts the timer
-        timer.schedule(timerTask, 4000, Integer.valueOf(_timeInterval.getText().toString()) * 1000);
+        timer.schedule(timerTask, Interval, Interval);
     }
 
 
@@ -146,9 +147,11 @@ public class WordsActivity extends AppCompatActivity {
                             weHaveWord = false;
                             currentNum = currentNum + 1;
                         } else {
+                            stopTimerTask();
                             newWord = new Word(String.valueOf(currentNum));
                             _textView.setText(newWord._en);
                             weHaveWord = true;
+                            startTimer();
                         }
 
                         //Закончились слова. Заново
@@ -175,6 +178,7 @@ public class WordsActivity extends AppCompatActivity {
             if (ProgramAlredyStarted == false) {
                 startNum = Integer.valueOf(_firstWord.getText().toString());
                 lastNum = Integer.valueOf(_lastWord.getText().toString());
+                Interval = Integer.valueOf(_timeInterval.getText().toString()) * 1000;
                 currentNum = startNum;
 
                 ProgramAlredyStarted = true;
