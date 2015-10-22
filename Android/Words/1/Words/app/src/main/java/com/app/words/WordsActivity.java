@@ -1,8 +1,10 @@
 package com.app.words;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -41,6 +43,7 @@ class Word {
         InputStream in;
         int data;
         InputStreamReader isw;
+//        context = this;
 
         try {
             //Слово EN (_en)
@@ -68,22 +71,33 @@ class Word {
             }
 
 
-            //Звук EN (_enSound)
-            url = new URL("http://tests.progmans.net/index.php?NUM_EN_SOUND=" + _num);
-            urlConnection = (HttpURLConnection) url.openConnection();
-            in = urlConnection.getInputStream();
-            filename = "en_" + _num + ".wav";
-            _enSound = new File(context.getFilesDir(), filename);
-            copyInputStreamToFile(in, _enSound);
+
+            if (isExternalStorageWritable()) {
+                //Звук EN (_enSound)
+                url = new URL("http://tests.progmans.net/index.php?NUM_EN_SOUND=" + _num);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                in = urlConnection.getInputStream();
+                filename = "en_" + _num + ".wav";
+//            _enSound = new File(context.getFilesDir(), filename);
+                _enSound = new File(getSoundStorageDir("app_words"), filename);
+                copyInputStreamToFile(in, _enSound);
 
 
-            //Звук RU (_ruSound)
-            url = new URL("http://tests.progmans.net/index.php?NUM_RU_SOUND=" + _num);
-            urlConnection = (HttpURLConnection) url.openConnection();
-            in = urlConnection.getInputStream();
-            filename = "ru_" + _num + ".wav";
-            _ruSound = new File(context.getFilesDir(), filename);
-            copyInputStreamToFile(in, _ruSound);
+                //Звук RU (_ruSound)
+                url = new URL("http://tests.progmans.net/index.php?NUM_RU_SOUND=" + _num);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                in = urlConnection.getInputStream();
+                filename = "ru_" + _num + ".wav";
+//            _ruSound = new File(context.getFilesDir(), filename);
+                _ruSound = new File(getSoundStorageDir("app_words"), filename);
+                copyInputStreamToFile(in, _ruSound);
+
+
+            } else {
+                _en = "Storage is not available";
+                _ru = "Storage is not available";
+            }
+
 
 
         } catch (Exception e) {
@@ -98,8 +112,37 @@ class Word {
     }
 
 
+
+
+    // Get the directory for the app's private pictures directory.
+    public File getSoundStorageDir(String albumName) {
+//        File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_MUSIC), albumName);
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), albumName);
+        if (!file.mkdirs()) {
+//            Log.e(LOG_TAG, "Directory not created");
+        }
+        return file;
+    }
+
+
+
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        if ((Environment.MEDIA_MOUNTED.equals("mounted")) && (Environment.getExternalStorageState().equals("shared"))) {
+            return true;
+        }
+        return false;
+/*
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;    */
+    }
+
+
     //Копирует InputStream из URL в файл (http://stackoverflow.com/questions/10854211/android-store-inputstream-in-file)
-    private void copyInputStreamToFile( InputStream in, File file ) {
+    private void copyInputStreamToFile(InputStream in, File file) {
         try {
             OutputStream out = new FileOutputStream(file);
             byte[] buf = new byte[1024];
