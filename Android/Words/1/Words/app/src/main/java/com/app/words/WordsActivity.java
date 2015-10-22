@@ -7,8 +7,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.content.Context;
+
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.util.Timer;
@@ -19,7 +24,12 @@ import java.util.TimerTask;
 class Word {
     public String _en = "";
     public String _ru = "";
+    public File _enSound;
+    public File _ruSound;
+
     private String _num = "";
+    private Context context;
+    private String filename;
 
 
     //Конструктор
@@ -57,6 +67,25 @@ class Word {
                 _ru = _ru + currentSymbol;
             }
 
+
+            //Звук EN (_enSound)
+            url = new URL("http://tests.progmans.net/index.php?NUM_EN_SOUND=" + _num);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            in = urlConnection.getInputStream();
+            filename = "en_" + _num + ".wav";
+            _enSound = new File(context.getFilesDir(), filename);
+            copyInputStreamToFile(in, _enSound);
+
+
+            //Звук RU (_ruSound)
+            url = new URL("http://tests.progmans.net/index.php?NUM_RU_SOUND=" + _num);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            in = urlConnection.getInputStream();
+            filename = "ru_" + _num + ".wav";
+            _ruSound = new File(context.getFilesDir(), filename);
+            copyInputStreamToFile(in, _ruSound);
+
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -65,6 +94,23 @@ class Word {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+
+    //Копирует InputStream из URL в файл (http://stackoverflow.com/questions/10854211/android-store-inputstream-in-file)
+    private void copyInputStreamToFile( InputStream in, File file ) {
+        try {
+            OutputStream out = new FileOutputStream(file);
+            byte[] buf = new byte[1024];
+            int len;
+            while((len = in.read(buf)) > 0){
+                out.write(buf, 0, len);
+            }
+            out.close();
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 };
@@ -143,12 +189,19 @@ public class WordsActivity extends AppCompatActivity {
                 handler.post(new Runnable() {
                     public void run() {
                         if (weHaveWord) {
+                            //У нас есть слово. Крутим его
+
                             _textView.setText(newWord._ru);
                             weHaveWord = false;
                             currentNum = currentNum + 1;
+
                         } else {
+                            //Нет слова. Достанем новое
                             stopTimerTask();
+
+                            //Достать новое слово
                             newWord = new Word(String.valueOf(currentNum));
+
                             _textView.setText(newWord._en);
                             weHaveWord = true;
                             startTimer();

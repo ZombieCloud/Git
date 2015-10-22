@@ -7,7 +7,7 @@ if ($connection->connect_error) die($connection->connect_error);
 $connection->set_charset("utf8");
 
 
-
+//Англ.слово
 if (isset($_GET['NUM_EN']))
 {    
     $num = get_post($connection, 'NUM_EN');
@@ -19,7 +19,7 @@ if (isset($_GET['NUM_EN']))
     echo $row['en'];
 }
 
-
+//Рус.слово
 if (isset($_GET['NUM_RU']))
 {    
     $num = get_post($connection, 'NUM_RU');
@@ -31,10 +31,34 @@ if (isset($_GET['NUM_RU']))
     echo $row['ru'];
 }
 
+//Англ.звукозапись
+if (isset($_GET['NUM_EN_SOUND']))
+{    
+    $num = get_post($connection, 'NUM_EN_SOUND');
+    $query = "SELECT en_sound FROM tab_words1 WHERE num='$num'";
+    $result = $connection->query($query);
+    if (!$result) die ($connection->error);
+    $result->data_seek(0);
+    $row = $result->fetch_array(MYSQLI_ASSOC);    
+    echo $row['en_sound'];
+}
 
+//Рус.звукозапись
+if (isset($_GET['NUM_RU_SOUND']))
+{    
+    $num = get_post($connection, 'NUM_RU_SOUND');
+    $query = "SELECT ru_sound FROM tab_words1 WHERE num='$num'";
+    $result = $connection->query($query);
+    if (!$result) die ($connection->error);
+    $result->data_seek(0);
+    $row = $result->fetch_array(MYSQLI_ASSOC);    
+    echo $row['ru_sound'];
+}
 
 $result->close();
 $connection->close();
+
+
 
 
 function get_post($connection, $var)
