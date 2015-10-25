@@ -1,18 +1,20 @@
 package com.app.words;
 
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.content.Context;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -30,7 +32,6 @@ class Word {
     public File _ruSound;
 
     private String _num = "";
-    private Context context;
     private String filename;
 
 
@@ -43,7 +44,6 @@ class Word {
         InputStream in;
         int data;
         InputStreamReader isw;
-//        context = this;
 
         try {
             //Слово EN (_en)
@@ -78,9 +78,10 @@ class Word {
                 urlConnection = (HttpURLConnection) url.openConnection();
                 in = urlConnection.getInputStream();
                 filename = "en_" + _num + ".wav";
-//            _enSound = new File(context.getFilesDir(), filename);
                 _enSound = new File(getSoundStorageDir("app_words"), filename);
-                copyInputStreamToFile(in, _enSound);
+                if (!_enSound.exists()) {
+                    copyInputStreamToFile(in, _enSound);
+                }
 
 
                 //Звук RU (_ruSound)
@@ -88,9 +89,10 @@ class Word {
                 urlConnection = (HttpURLConnection) url.openConnection();
                 in = urlConnection.getInputStream();
                 filename = "ru_" + _num + ".wav";
-//            _ruSound = new File(context.getFilesDir(), filename);
                 _ruSound = new File(getSoundStorageDir("app_words"), filename);
-                copyInputStreamToFile(in, _ruSound);
+                if (!_ruSound.exists()) {
+                    copyInputStreamToFile(in, _ruSound);
+                }
 
 
             } else {
@@ -116,7 +118,6 @@ class Word {
 
     // Get the directory for the app's private pictures directory.
     public File getSoundStorageDir(String albumName) {
-//        File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_MUSIC), albumName);
         File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), albumName);
         if (!file.mkdirs()) {
 //            Log.e(LOG_TAG, "Directory not created");
@@ -128,16 +129,11 @@ class Word {
 
     /* Checks if external storage is available for read and write */
     public boolean isExternalStorageWritable() {
-        if ((Environment.MEDIA_MOUNTED.equals("mounted")) && (Environment.getExternalStorageState().equals("shared"))) {
-            return true;
-        }
-        return false;
-/*
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
             return true;
         }
-        return false;    */
+        return false;
     }
 
 
@@ -182,6 +178,7 @@ public class WordsActivity extends AppCompatActivity {
     TimerTask timerTask;
     final Handler handler = new Handler();
     Button button;
+    Uri myUri;
 
 
     @Override
@@ -234,7 +231,9 @@ public class WordsActivity extends AppCompatActivity {
                         if (weHaveWord) {
                             //У нас есть слово. Крутим его
 
-                            _textView.setText(newWord._ru);
+                            _textView.setText(newWord._en);
+                            PlayWord(newWord._enSound);
+
                             weHaveWord = false;
                             currentNum = currentNum + 1;
 
@@ -245,7 +244,9 @@ public class WordsActivity extends AppCompatActivity {
                             //Достать новое слово
                             newWord = new Word(String.valueOf(currentNum));
 
-                            _textView.setText(newWord._en);
+                            _textView.setText(newWord._ru);
+                            PlayWord(newWord._ruSound);
+
                             weHaveWord = true;
                             startTimer();
                         }
@@ -282,6 +283,26 @@ public class WordsActivity extends AppCompatActivity {
 
             startTimer();
         }
+    }
+
+
+
+    private void PlayWord(File fileToPlay) {
+        myUri = Uri.parse(fileToPlay.getAbsolutePath());   //"/mnt/sdcard/app_words/en_1.wav"
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        try {
+            mediaPlayer.setDataSource(getApplicationContext(), myUri);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        mediaPlayer.start();
     }
 
 }
