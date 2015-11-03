@@ -45,8 +45,9 @@ class Word {
         int data;
         InputStreamReader isw;
 
+
+        //Слово EN (_en) ------------------
         try {
-            //Слово EN (_en)
             url = new URL("http://tests.progmans.net/index.php?NUM_EN=" + _num);
             urlConnection = (HttpURLConnection) url.openConnection();
             in = urlConnection.getInputStream();
@@ -58,7 +59,19 @@ class Word {
                 _en = _en + currentSymbol;
             }
 
-            //Слово RU (_ru)
+        } catch (Exception e) {     //  Нет интернета
+            _en = "Something wrong with internet :(";
+            e.printStackTrace();
+        }  finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+        }
+
+
+
+        //Слово RU (_ru) -----------------------
+        try {
             url = new URL("http://tests.progmans.net/index.php?NUM_RU=" + _num);
             urlConnection = (HttpURLConnection) url.openConnection();
             in = urlConnection.getInputStream();
@@ -70,46 +83,69 @@ class Word {
                 _ru = _ru + currentSymbol;
             }
 
+        } catch (Exception e) {     // Нет интернета
+            _ru = "Something wrong with internet :(";
+            e.printStackTrace();
+        }  finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+        }
 
 
-            if (isExternalStorageWritable()) {
-                //Звук EN (_enSound)
-                url = new URL("http://tests.progmans.net/index.php?NUM_EN_SOUND=" + _num);
-                urlConnection = (HttpURLConnection) url.openConnection();
-                in = urlConnection.getInputStream();
+
+        if (isExternalStorageWritable()) {
+
+            //Звук EN (_enSound) --------------------------------
+            try {
                 filename = "en_" + _num + ".wav";
                 _enSound = new File(getSoundStorageDir("app_words"), filename);
                 if (!_enSound.exists()) {
+                    url = new URL("http://tests.progmans.net/index.php?NUM_EN_SOUND=" + _num);
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    in = urlConnection.getInputStream();
                     copyInputStreamToFile(in, _enSound);
                 }
 
+            } catch (Exception e) {    // Нет интернета
+                _en = "Something wrong with sound files or internet:(";
+                _enSound = null;
+                e.printStackTrace();
 
-                //Звук RU (_ruSound)
-                url = new URL("http://tests.progmans.net/index.php?NUM_RU_SOUND=" + _num);
-                urlConnection = (HttpURLConnection) url.openConnection();
-                in = urlConnection.getInputStream();
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+            }
+
+
+
+            //Звук RU (_ruSound) -----------------------------
+            try {
                 filename = "ru_" + _num + ".wav";
                 _ruSound = new File(getSoundStorageDir("app_words"), filename);
                 if (!_ruSound.exists()) {
+                    url = new URL("http://tests.progmans.net/index.php?NUM_RU_SOUND=" + _num);
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    in = urlConnection.getInputStream();
                     copyInputStreamToFile(in, _ruSound);
                 }
 
-
-            } else {
-                _en = "Storage is not available";
-                _ru = "Storage is not available";
-            }
-
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                urlConnection.disconnect();
-            } catch (Exception e) {
+            } catch (Exception e) {    // Нет интернета
+                _ru = "Something wrong with sound files or internet:(";
+                _ruSound = null;
                 e.printStackTrace();
+
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
             }
+
+
+        } else {
+            _en = "Storage is not available :(";
+            _ru = "Storage is not available :(";
         }
     }
 
@@ -228,6 +264,7 @@ public class WordsActivity extends AppCompatActivity {
                 //use a handler to run
                 handler.post(new Runnable() {
                     public void run() {
+
                         if (weHaveWord) {
                             //У нас есть слово. Крутим его
 
@@ -272,7 +309,7 @@ public class WordsActivity extends AppCompatActivity {
             stopTimerTask();
 
         } else {
-            if (ProgramAlredyStarted == false) {
+            if (!ProgramAlredyStarted) {
                 startNum = Integer.valueOf(_firstWord.getText().toString());
                 lastNum = Integer.valueOf(_lastWord.getText().toString());
                 Interval = Integer.valueOf(_timeInterval.getText().toString()) * 1000;
@@ -288,21 +325,16 @@ public class WordsActivity extends AppCompatActivity {
 
 
     private void PlayWord(File fileToPlay) {
-        myUri = Uri.parse(fileToPlay.getAbsolutePath());   //"/mnt/sdcard/app_words/en_1.wav"
         MediaPlayer mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
+            myUri = Uri.parse(fileToPlay.getAbsolutePath());             // "/mnt/sdcard/app_words/en_1.wav"
             mediaPlayer.setDataSource(getApplicationContext(), myUri);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
             mediaPlayer.prepare();
+            mediaPlayer.start();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        mediaPlayer.start();
     }
 
 }

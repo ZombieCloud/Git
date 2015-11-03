@@ -20,7 +20,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="New Text"
+            android:text="Hi !!!"
             android:id="@+id/textView"
             android:layout_gravity="center_horizontal"
             android:layout_weight="0.94"
